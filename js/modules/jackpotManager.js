@@ -22,14 +22,57 @@ class JackpotManager {
     }
 
     init() {
+        // Close button
         if (this.closeBtn) {
-            this.closeBtn.addEventListener('click', () => {
+            this.closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 this.hide();
                 if (this.callback) {
                     this.callback();
                     this.callback = null;
                 }
             });
+            
+            // Touch support for mobile
+            this.closeBtn.addEventListener('touchend', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                this.hide();
+                if (this.callback) {
+                    this.callback();
+                    this.callback = null;
+                }
+            });
+        }
+        
+        // Close on backdrop click/touch
+        const backdrop = document.getElementById('jackpotBackdrop');
+        if (backdrop) {
+            backdrop.addEventListener('click', () => {
+                this.hide();
+                if (this.callback) {
+                    this.callback();
+                    this.callback = null;
+                }
+            });
+            
+            backdrop.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                this.hide();
+                if (this.callback) {
+                    this.callback();
+                    this.callback = null;
+                }
+            });
+        }
+        
+        // Prevent content clicks from closing
+        if (this.overlay) {
+            const content = this.overlay.querySelector('.jackpot-content');
+            if (content) {
+                content.addEventListener('click', (e) => e.stopPropagation());
+                content.addEventListener('touchend', (e) => e.stopPropagation());
+            }
         }
     }
 
