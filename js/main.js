@@ -6,9 +6,10 @@ import AudioManager from './modules/audioManager.js';
 import UIManager from './modules/uiManager.js';
 import BackgroundAnimation from './modules/background.js';
 import JackpotManager from './modules/jackpotManager.js';
-import IndividualMode from './modules/individualMode.js';
 import RaceMode from './modules/raceMode.js';
 import CompetitiveMode from './modules/competitiveMode.js';
+import RitualMode from './modules/ritualMode.js';
+import FortuneWheelMode from './modules/fortuneWheelMode.js';
 
 class MrLuckyApp {
     constructor() {
@@ -47,7 +48,13 @@ class MrLuckyApp {
             btn.addEventListener('click', () => {
                 const mode = btn.dataset.mode;
                 this.selectedMode = mode;
-                this.ui.showScreen('difficulty');
+                
+                // Race mode and new modes go directly without difficulty selection (uses 'easy' by default)
+                if (mode === 'race' || mode === 'ritual' || mode === 'fortuneWheel') {
+                    this.startGame(mode, 'easy');
+                } else {
+                    this.ui.showScreen('difficulty');
+                }
             });
         });
     }
@@ -78,18 +85,28 @@ class MrLuckyApp {
         this.stopCurrentGame();
 
         // Show appropriate screen
-        this.ui.showScreen(mode);
+        const screenMap = {
+            'race': 'race',
+            'competitive': 'competitive',
+            'ritual': 'ritual',
+            'fortuneWheel': 'fortuneWheel'
+        };
+        this.ui.showScreen(screenMap[mode] || mode);
 
         // Initialize game mode - pass jackpot manager to all modes
+        // Always create new instance to ensure fresh state (especially for ritual)
         switch (mode) {
-            case 'individual':
-                this.currentGameMode = new IndividualMode(this.audio, this.ui, difficulty, this.jackpot);
-                break;
             case 'race':
                 this.currentGameMode = new RaceMode(this.audio, this.ui, difficulty, this.jackpot);
                 break;
             case 'competitive':
                 this.currentGameMode = new CompetitiveMode(this.audio, this.ui, difficulty, this.jackpot);
+                break;
+            case 'ritual':
+                this.currentGameMode = new RitualMode(this.audio, this.ui, this.jackpot);
+                break;
+            case 'fortuneWheel':
+                this.currentGameMode = new FortuneWheelMode(this.audio, this.ui, this.jackpot);
                 break;
         }
 

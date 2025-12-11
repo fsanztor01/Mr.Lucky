@@ -33,18 +33,10 @@
     </button>
 
     <!-- Audio Elements -->
-    <audio id="bgMusic" loop>
-        <source src="assets/music.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="successSound">
-        <source src="assets/success.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="failSound">
-        <source src="assets/fail.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="explosionSound">
-        <source src="assets/explosion.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bgMusic" loop></audio>
+    <audio id="successSound"></audio>
+    <audio id="failSound"></audio>
+    <audio id="explosionSound"></audio>
 
     <!-- Jackpot Celebration Overlay -->
     <div id="jackpotOverlay" class="jackpot-overlay">
@@ -131,13 +123,13 @@
                 <span class="title-icon">🍀</span>
             </h1>
             <p class="subtitle">✨ Elige tu juego de suerte ✨</p>
-            </button>
 
+            <div class="menu-grid">
             <button class="menu-btn luck-themed" data-mode="race">
                 <div class="btn-glow"></div>
                 <span class="btn-icon">🏃</span>
                 <span class="btn-text">Carrera de la Suerte</span>
-                <span class="btn-desc">¡Toca rápido para ganar!</span>
+                <span class="btn-desc">¡Toca rápido para ganar! ⚡</span>
                 <div class="btn-coins">
                     <span>⭐</span>
                     <span>⭐</span>
@@ -149,13 +141,38 @@
                 <div class="btn-glow"></div>
                 <span class="btn-icon">⚡</span>
                 <span class="btn-text">Duelo de Fortuna</span>
-                <span class="btn-desc">1vs1 - ¡Racha 10 = LUCKY MOMENTUM!</span>
+                <span class="btn-desc">1vs1 - ¡Racha 10 = LUCKY MOMENTUM! 🎲</span>
                 <div class="btn-coins">
                     <span>🎲</span>
                     <span>🎲</span>
                     <span>🎲</span>
                 </div>
             </button>
+
+            <button class="menu-btn luck-themed" data-mode="ritual">
+                <div class="btn-glow"></div>
+                <span class="btn-icon">🔮</span>
+                <span class="btn-text">Ritual de Suerte</span>
+                <span class="btn-desc">Carga tu suerte al máximo ✨</span>
+                <div class="btn-coins">
+                    <span>✨</span>
+                    <span>✨</span>
+                    <span>✨</span>
+                </div>
+            </button>
+
+            <button class="menu-btn luck-themed" data-mode="fortuneWheel">
+                <div class="btn-glow"></div>
+                <span class="btn-icon">🎡</span>
+                <span class="btn-text">Rueda de la Fortuna</span>
+                <span class="btn-desc">Gira y descubre tu suerte 🎰</span>
+                <div class="btn-coins">
+                    <span>🎰</span>
+                    <span>🎰</span>
+                    <span>🎰</span>
+                </div>
+            </button>
+            </div>
         </div>
     </div>
     </div>
@@ -346,6 +363,166 @@
             <button class="back-btn">← Volver al Menú</button>
         </div>
         <canvas class="confetti-canvas" id="compConfetti"></canvas>
+    </div>
+
+    <!-- Ritual Mode Screen -->
+    <div id="ritualScreen" class="screen game-screen">
+        <div class="container">
+            <h2 class="screen-title">🔮 Ritual de Suerte ✨</h2>
+            <p class="subtitle ritual-instruction" id="ritualInstruction">Coloca los objetos en el pentagrama para completar el ritual</p>
+
+            <div class="ritual-container">
+                <!-- Pentagrama -->
+                <div class="ritual-pentagram-container">
+                    <svg class="ritual-pentagram" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Pentagrama lines -->
+                        <path class="pentagram-line" d="M 150 50 L 180 120 L 260 120 L 200 170 L 230 250 L 150 200 L 70 250 L 100 170 L 40 120 L 120 120 Z" 
+                              fill="none" stroke="rgba(255, 215, 0, 0.3)" stroke-width="2"/>
+                        <circle class="pentagram-circle" cx="150" cy="150" r="80" 
+                                fill="none" stroke="rgba(255, 215, 0, 0.2)" stroke-width="1"/>
+                    </svg>
+                    
+                    <!-- Casillas visibles para los objetos -->
+                    <div class="ritual-slots">
+                        <div class="ritual-slot" data-slot="0" data-emoji="🔮">
+                            <div class="slot-frame"></div>
+                        </div>
+                        <div class="ritual-slot" data-slot="1" data-emoji="✨">
+                            <div class="slot-frame"></div>
+                        </div>
+                        <div class="ritual-slot" data-slot="2" data-emoji="🍀">
+                            <div class="slot-frame"></div>
+                        </div>
+                        <div class="ritual-slot" data-slot="3" data-emoji="🔥">
+                            <div class="slot-frame"></div>
+                        </div>
+                        <div class="ritual-slot" data-slot="4" data-emoji="🧿">
+                            <div class="slot-frame"></div>
+                        </div>
+                        <div class="ritual-slot" data-slot="5" data-emoji="🌙">
+                            <div class="slot-frame"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Objetos de suerte (drag items) -->
+                <div class="ritual-items-container" id="ritualItemsContainer">
+                    <div class="ritual-item" draggable="true" data-emoji="🔮" data-item-id="0">
+                        <span class="item-emoji">🔮</span>
+                    </div>
+                    <div class="ritual-item" draggable="true" data-emoji="✨" data-item-id="1">
+                        <span class="item-emoji">✨</span>
+                    </div>
+                    <div class="ritual-item" draggable="true" data-emoji="🍀" data-item-id="2">
+                        <span class="item-emoji">🍀</span>
+                    </div>
+                    <div class="ritual-item" draggable="true" data-emoji="🔥" data-item-id="3">
+                        <span class="item-emoji">🔥</span>
+                    </div>
+                    <div class="ritual-item" draggable="true" data-emoji="🧿" data-item-id="4">
+                        <span class="item-emoji">🧿</span>
+                    </div>
+                    <div class="ritual-item" draggable="true" data-emoji="🌙" data-item-id="5">
+                        <span class="item-emoji">🌙</span>
+                    </div>
+                </div>
+
+                <!-- Mensaje de estado -->
+                <div class="ritual-status-message" id="ritualStatusMessage"></div>
+
+                <!-- Barra de progreso de carga de suerte -->
+                <div class="ritual-progress-container" id="ritualProgressContainer" style="display: none;">
+                    <div class="ritual-progress-bar-wrapper">
+                        <div class="ritual-progress-bar" id="ritualProgressBar">
+                            <div class="ritual-progress-fill" id="ritualProgressFill"></div>
+                            <div class="ritual-progress-text" id="ritualProgressText">0%</div>
+                        </div>
+                    </div>
+                    <div class="ritual-progress-message" id="ritualProgressMessage">Conectando con el universo...</div>
+                </div>
+
+                <!-- Resultado del ritual -->
+                <div class="ritual-result-container" id="ritualResultContainer" style="display: none;">
+                    <div class="ritual-result-content">
+                        <h3 class="ritual-result-name" id="ritualResultName"></h3>
+                        <p class="ritual-result-message" id="ritualResultMessage"></p>
+                        <div class="ritual-stats">
+                            <div class="ritual-luck-level" id="ritualLuckLevel"></div>
+                            <div class="ritual-aura-color" id="ritualAuraColor"></div>
+                        </div>
+                        <button class="action-btn luck-themed" id="ritualBlessedNumbersBtn">
+                            <span class="btn-icon-left">🎲</span>
+                            Números Bendecidos
+                            <span class="btn-icon-right">🎲</span>
+                        </button>
+                        <div class="ritual-blessed-numbers" id="ritualBlessedNumbers" style="display: none;"></div>
+                        <button class="action-btn luck-action" id="ritualRestartBtn" style="margin-top: var(--spacing-md);">
+                            <span class="btn-icon-left">🔄</span>
+                            Realizar Otro Ritual
+                            <span class="btn-icon-right">✨</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="back-btn" id="ritualBackBtn">← Volver al Menú</button>
+        </div>
+        <canvas class="confetti-canvas" id="ritualConfetti"></canvas>
+    </div>
+
+    <!-- Fortune Wheel Mode Screen -->
+    <div id="fortuneWheelScreen" class="screen game-screen">
+        <div class="container">
+            <h2 class="screen-title">🎡 Rueda de la Fortuna 🎰</h2>
+            <p class="subtitle">Gira la rueda y descubre tu nivel de suerte</p>
+
+            <div class="fortune-wheel-container">
+                <div class="fortune-wheel-wrapper">
+                    <div class="fortune-wheel-pointer" id="fortuneWheelPointer">⬇️</div>
+                    <div class="fortune-wheel" id="fortuneWheel">
+                        <div class="wheel-segment" style="--segment-index: 0; --total-segments: 6;">
+                            <span class="segment-emoji">🎰</span>
+                            <span class="segment-text">Máxima</span>
+                        </div>
+                        <div class="wheel-segment" style="--segment-index: 1; --total-segments: 6;">
+                            <span class="segment-emoji">💰</span>
+                            <span class="segment-text">Gran</span>
+                        </div>
+                        <div class="wheel-segment" style="--segment-index: 2; --total-segments: 6;">
+                            <span class="segment-emoji">🍀</span>
+                            <span class="segment-text">Buena</span>
+                        </div>
+                        <div class="wheel-segment" style="--segment-index: 3; --total-segments: 6;">
+                            <span class="segment-emoji">🎲</span>
+                            <span class="segment-text">Normal</span>
+                        </div>
+                        <div class="wheel-segment" style="--segment-index: 4; --total-segments: 6;">
+                            <span class="segment-emoji">⭐</span>
+                            <span class="segment-text">Básica</span>
+                        </div>
+                        <div class="wheel-segment" style="--segment-index: 5; --total-segments: 6;">
+                            <span class="segment-emoji">🔮</span>
+                            <span class="segment-text">Mínima</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="action-btn luck-action" id="fortuneWheelSpinBtn">
+                    <span class="btn-pulse"></span>
+                    <span class="btn-icon-left">🎡</span>
+                    GIRAR RUEDA
+                    <span class="btn-icon-right">🎰</span>
+                </button>
+
+                <div class="fortune-wheel-result">
+                    <div class="message" id="fortuneWheelResult"></div>
+                    <div class="message-details" id="fortuneWheelResultDetails"></div>
+                </div>
+            </div>
+
+            <button class="back-btn">← Volver al Menú</button>
+        </div>
+        <canvas class="confetti-canvas" id="fortuneWheelConfetti"></canvas>
     </div>
 
     <!-- Main JavaScript Module -->

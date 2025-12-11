@@ -22,11 +22,31 @@ class IndividualMode {
         this.animationId = null;
         this.isPaused = false;
 
+        // Elementos del DOM
         this.bar = document.getElementById('indBar');
         this.target = document.getElementById('indTarget');
         this.actionBtn = document.getElementById('indActionBtn');
         this.streakBanner = document.getElementById('streakGoalBanner');
 
+        // Handlers para poder desuscribir en destroy()
+        this.handleActionClick = () => this.checkHit();
+        this.handleActionTouch = (e) => {
+            e.preventDefault();
+            this.checkHit();
+        };
+
+        // Comprobación básica de DOM
+        if (!this.bar || !this.target) {
+            console.error('[IndividualMode] Faltan elementos de barra/target en el DOM.');
+            return;
+        }
+
+        if (!this.actionBtn) {
+            console.error('[IndividualMode] Falta el botón indActionBtn en el DOM.');
+            return;
+        }
+
+        this.bindEvents();
         this.init();
     }
 
@@ -37,7 +57,18 @@ class IndividualMode {
             hard: 1.1,
             insane: 1.6
         };
-        return speeds[this.difficulty] || 0.7;
+        return speeds[this.difficulty] || speeds.normal;
+    }
+
+    bindEvents() {
+        this.actionBtn.addEventListener('click', this.handleActionClick);
+        this.actionBtn.addEventListener('touchstart', this.handleActionTouch, { passive: false });
+    }
+
+    unbindEvents() {
+        if (!this.actionBtn) return;
+        this.actionBtn.removeEventListener('click', this.handleActionClick);
+        this.actionBtn.removeEventListener('touchstart', this.handleActionTouch);
     }
 
     init() {
@@ -51,19 +82,13 @@ class IndividualMode {
         this.target.style.left = this.targetPosition + '%';
 
         this.animate();
-
-        // Handle both click and touch
-        this.actionBtn.addEventListener('click', () => this.checkHit());
-        this.actionBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            this.checkHit();
-        });
     }
 
     updateStreakBanner() {
         if (!this.streakBanner) return;
 
         const goalText = this.streakBanner.querySelector('.goal-text');
+        if (!goalText) return;
 
         if (this.streak < 5) {
             this.streakBanner.classList.remove('double-or-nothing');
@@ -80,7 +105,7 @@ class IndividualMode {
     animate() {
         if (this.isPaused) return;
 
-        // Chaos mechanics: random speed variation
+        // Chaos mechanics: variación aleatoria de velocidad
         this.currentSpeed = this.baseSpeed + (Math.random() - 0.5) * 0.4;
 
         this.barPosition += this.currentSpeed * this.direction;
@@ -93,7 +118,7 @@ class IndividualMode {
             this.direction = -1;
         }
 
-        // Occasionally move target (chaos element)
+        // Mover target ocasionalmente (componente “caos”)
         if (Math.random() < 0.015) {
             this.targetPosition = 20 + Math.random() * 50;
             this.target.style.left = this.targetPosition + '%';
@@ -112,6 +137,7 @@ class IndividualMode {
     }
 
     resume() {
+        if (!this.isPaused) return; // evita doble animación
         this.isPaused = false;
         this.animate();
     }
@@ -119,10 +145,13 @@ class IndividualMode {
     checkHit() {
         if (this.isPaused) return;
 
+        const barWidth = 15;
+        const targetWidth = 20;
+
         const barLeft = this.barPosition;
-        const barRight = barLeft + 15;
+        const barRight = barLeft + barWidth;
         const targetLeft = this.targetPosition;
-        const targetRight = targetLeft + 20;
+        const targetRight = targetLeft + targetWidth;
 
         const isHit = barRight > targetLeft && barLeft < targetRight;
 
@@ -134,13 +163,13 @@ class IndividualMode {
             this.ui.updateStat('indStreak', this.streak);
             this.updateStreakBanner();
 
-            // Check for jackpot at streak 5 (double or nothing)
+            // Jackpot a racha 5 (doble o nada)
             if (this.streak === 5) {
                 this.triggerDoubleOrNothing();
                 return;
             }
 
-            // Check for final jackpot at streak 10
+            // Jackpot final a racha 10
             if (this.streak === 10) {
                 this.triggerFinalJackpot();
                 return;
@@ -179,27 +208,46 @@ class IndividualMode {
 
         this.jackpot.showDoubleOrNothing(
             () => {
-                // Continue playing
+                // Sigue jugando
                 this.resume();
                 this.ui.showMessage('indMessage', '¡Vamos por la racha 10! 🔥', true);
             },
             () => {
-                // Quit (not used but kept for future)
+                // Opción “perder todo”: resetea racha
                 this.resume();
                 this.streak = 0;
                 this.ui.updateStat('indStreak', this.streak);
                 this.updateStreakBanner();
+            }
+        );
+    }
+
+    triggerFinalJackpot() {
+        this.pause();
+
+        this.jackpot.show({
+            onClose: () => {
                 this.resume();
+                this.ui.showMessage('indMessage', '¡LUCKY MOMENTUM alcanzado! 🎰', true);
             }
         });
-}
-
-destroy() {
-    if (this.animationId) {
-        cancelAnimationFrame(this.animationId);
     }
-    this.confetti.clear();
-}
+
+    destroy() {
+        // Parar animación
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+            this.animationId = null;
+        }
+
+        // Quitar listeners
+        this.unbindEvents();
+
+        // Limpiar confeti
+        if (this.confetti && typeof this.confetti.clear === 'function') {
+            this.confetti.clear();
+        }
+    }
 }
 
 export default IndividualMode;

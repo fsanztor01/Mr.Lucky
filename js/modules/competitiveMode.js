@@ -249,18 +249,27 @@ class CompetitiveMode {
             },
             () => {
                 this.resume();
-            }
                 if (player === 1) {
-            this.streak1 = 0;
-            this.ui.updateStat('comp1Streak', this.streak1);
-        } else {
-            this.streak2 = 0;
-            this.ui.updateStat('comp2Streak', this.streak2);
-        }
-        this.updateStreakBanner();
-        this.resume();
+                    this.streak1 = 0;
+                    this.ui.updateStat('comp1Streak', this.streak1);
+                } else {
+                    this.streak2 = 0;
+                    this.ui.updateStat('comp2Streak', this.streak2);
+                }
+                this.updateStreakBanner();
+            }
+        );
     }
-});
+
+    triggerFinalJackpot(player) {
+        this.pause();
+
+        this.jackpot.show({
+            onClose: () => {
+                this.resume();
+                this.ui.showMessage('compMessage', `¡Jugador ${player} alcanzó el LUCKY MOMENTUM! 🎰`, true);
+            }
+        });
     }
 
 destroy() {

@@ -9,9 +9,10 @@ class UIManager {
             welcome: document.getElementById('welcomeScreen'),
             main: document.getElementById('mainMenu'),
             difficulty: document.getElementById('difficultyScreen'),
-            individual: document.getElementById('individualScreen'),
             race: document.getElementById('raceScreen'),
-            competitive: document.getElementById('competitiveScreen')
+            competitive: document.getElementById('competitiveScreen'),
+            ritual: document.getElementById('ritualScreen'),
+            fortuneWheel: document.getElementById('fortuneWheelScreen')
         };
     }
 
